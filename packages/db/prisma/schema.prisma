@@ -14,11 +14,13 @@ datasource db {
 }
 
 model User {
-  id        Int         @id @default(autoincrement())
-  email     String?     @unique
-  name      String?
-  number    String      @unique
-  password  String
+  id                    Int         @id @default(autoincrement())
+  email                 String?     @unique
+  name                  String?
+  number                String      @unique
+  password              String
+  balance               Balance[]
+  onRampTransaction     OnRampTransaction[]
 }
 
 model Merchant {
@@ -28,7 +30,33 @@ model Merchant {
   auth_type     AuthType
 }
 
+model Balance {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @unique
+  balance   Int       
+  locked    Int
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+//To store history of transactions.
+model OnRampTransaction {
+  id            Int             @id @default(autoincrement())
+  status        OnRampStatus
+  token         String          @unique
+  provider      String
+  amount        Int
+  startTime     DateTime
+  userId        Int
+  user          User            @relation(fields: [userId], references: [id])
+}
+
 enum AuthType {
   Google
   Github
+}
+
+enum OnRampStatus {
+  Success
+  Failure
+  Processing
 }
